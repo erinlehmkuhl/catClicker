@@ -1,93 +1,148 @@
-//creates multiple new cat div
-var numCats = 5;
+$(function(){
 
-var kittenList = {'kittens':[
-	{'name': 'Scout', 
-	'image': 'img/kitten.jpg'},
+	var model = {
+		'kittens':[
+			{'name': 'Scout', 'image': 'img/kitten.jpg'},
+			{'name': 'Archimedes', 'image': 'img/catStaircase.jpg'},
+			{'name': 'Blue', 'image': 'img/baby.jpg'},
+			{'name': 'Smalls', 'image': 'img/catritto.jpg'},
+			{'name': 'Chukes', 'image': 'img/guineaPig.jpg'},
+		]
+	};
 
-	{'name': 'Archimedes', 
-	'image': 'img/catStaircase.jpg'},
 
-	{'name': 'Blue', 
-	'image': 'img/baby.jpg'},
-
-	{'name': 'Smalls', 
-	'image': 'img/catritto.jpg'},
-
-	{'name': 'Chukes', 
-	'image': 'img/guineaPig.jpg'},
-]};
-
-var staticCatList = function(numCats, kittenList) {
-	for  (var i = 0; i < numCats; i++) {
-		//make div
-		var listDiv = document.createElement('DIV');
-			listDiv.setAttribute('class', 'listDiv');
-
-		//make name
-		var listName = document.createElement('H2');
-		listName.innerHTML = kittenList.kittens[i].name;
+	var octopus = {
 		
-		//store cat info to pass it to next function
-		listName.name = kittenList.kittens[i].name;
-		listName.image = kittenList.kittens[i].image;
-		listName.addEventListener('click', clearPage)
-		listName.addEventListener('click', makeClickableCat);
-
-		//draw
-		listArea = document.getElementById('listArea').appendChild(listDiv);
-		listDiv.appendChild(listName);
-	}
-};
+		getCatList: function() {
+			this.catList = [];
+			for  (var i = 0; i < model.kittens.length; i++) {
+				this.catList.push(model.kittens[i].name);
+			}
+			return this.catList;
+		},
 
 
-
-var makeClickableCat = function(clickableEvent) {
-		//prepping DOM elements for insertion
-		//DIV
-		var indivCatDiv = document.createElement('DIV');
-		indivCatDiv.setAttribute('class', 'indivCatDiv');
-
-		//NAME
-		var name = document.createElement('H1');
-		name.innerHTML = clickableEvent.target.name;
-		
-		//IMAGE
-		var image = document.createElement('IMG');
-		image.setAttribute("src", clickableEvent.target.image);
-		image.setAttribute('alt', 'cat pic');
-		image.setAttribute('class', 'catButton');
-		image.addEventListener('click', cycleCounter);
-		
-		//COUNTER
-		var counter = document.createElement('P');
-		counter.innerHTML = '0';
-		counter.setAttribute('class', 'counterNumber');
-
-		//append to page
-		catArea = document.getElementById('catArea').appendChild(indivCatDiv);
-		indivCatDiv.appendChild(name);
-		indivCatDiv.appendChild(image);
-		indivCatDiv.appendChild(counter);
-};
+		getCatImageList: function() {
+			this.catImageList = [];
+			for  (var i = 0; i < model.kittens.length; i++) {
+				this.catImageList.push(model.kittens[i].image);
+			}
+			return this.catImageList;
+		},
 
 
-
-//upon click, incriments counter
-function cycleCounter() {
-	var num = this.nextSibling.innerHTML;
-	num++;
-	this.nextSibling.innerHTML = num;
-};
+		getImage: function() {
+			this.catImageList = octopus.getCatImageList();
+			viewMain.render.image = this.catImageList[this.index];
+		},
 
 
-//clears page before new cat is drawn
-function clearPage() {
-	document.getElementById('catArea').innerHTML = '';
-	document.getElementById('catArea').img = '';
-};
+		getName: function() {
+			viewMain.render.headline = this.innerHTML;
+		},
 
 
-staticCatList(numCats, kittenList);
+		init: function() {
+			//model.init();
+			viewSidebar.init();
+		}
+	};
 
+
+	var viewSidebar = {
+
+		init: function() {
+			this.catList = octopus.getCatList();
+
+			for  (var i = 0; i < this.catList.length; i++) {
+				this.sideBarDiv = document.createElement('DIV');
+				this.sideBarDiv.setAttribute('class', 'listDiv');
+
+				this.sideBarName = document.createElement('H2');
+				this.sideBarName.innerHTML = this.catList[i];
+				this.sideBarName.index = i;
+				this.sideBarName.addEventListener('click', octopus.getName);
+				this.sideBarName.addEventListener('click', octopus.getImage);
+				this.sideBarName.addEventListener('click', viewMain.render);
+				
+				viewSidebar.render();
+			}
+		},
+
+		render: function() {
+			listArea = document.getElementById('listArea').appendChild(this.sideBarDiv);
+			this.sideBarDiv.appendChild(this.sideBarName);
+		}
+
+	};
+
+
+	var viewMain = {
+
+		init: function() {
+
+		},
+
+
+		render: function() {
+			this.clickEvent = this;
+			viewMain.clearPage();
+
+			viewMain.div();
+			viewMain.headlineTop();
+			viewMain.imageLarge();
+			viewMain.counterBottom();
+
+			//append to page
+			this.catArea = document.getElementById('catArea').appendChild(viewMain.heroCatDiv);
+			viewMain.heroCatDiv.appendChild(viewMain.headline);
+			viewMain.heroCatDiv.appendChild(viewMain.image);
+			viewMain.heroCatDiv.appendChild(viewMain.counter);
+		}, 
+
+
+		div: function() {
+			this.heroCatDiv = document.createElement('DIV');
+			this.heroCatDiv.setAttribute('class', 'heroCatDiv');
+		},
+
+
+		headlineTop: function() {
+			this.headline = document.createElement('H1');
+			this.headline.innerHTML = viewMain.render.headline;
+		},
+
+
+		imageLarge: function() {
+			this.image = document.createElement('IMG');
+			this.image.setAttribute('src', viewMain.render.image);
+			this.image.setAttribute('alt', 'cat pic');
+			this.image.setAttribute('class', 'catButton');
+			this.image.addEventListener('click', viewMain.cycleCounter);
+		},
+
+
+		counterBottom: function() {
+			this.counter = document.createElement('P');
+			this.counter.innerHTML = '0';
+			this.counter.setAttribute('class', 'counterNumber');
+		},
+
+
+		clearPage: function() {
+			document.getElementById('catArea').innerHTML = '';
+			document.getElementById('catArea').img = '';
+		},
+
+
+		cycleCounter: function() {
+			this.num = this.nextSibling.innerHTML;
+			this.num++;
+			this.nextSibling.innerHTML = this.num;
+		}
+
+	};
+
+    octopus.init();
+});
 
