@@ -2,11 +2,11 @@ $(function(){
 
 	var model = {
 		'kittens':[
-			{'name': 'Scout', 'image': 'img/kitten.jpg'},
-			{'name': 'Archimedes', 'image': 'img/catStaircase.jpg'},
-			{'name': 'Blue', 'image': 'img/baby.jpg'},
-			{'name': 'Smalls', 'image': 'img/catritto.jpg'},
-			{'name': 'Chukes', 'image': 'img/guineaPig.jpg'},
+			{'name': 'Scout', 'image': 'img/kitten.jpg', 'counter': 0},
+			{'name': 'Archimedes', 'image': 'img/catStaircase.jpg', 'counter': 0},
+			{'name': 'Blue', 'image': 'img/baby.jpg', 'counter': 0},
+			{'name': 'Smalls', 'image': 'img/catritto.jpg', 'counter': 0},
+			{'name': 'Chukes', 'image': 'img/guineaPig.jpg', 'counter': 0}
 		]
 	};
 
@@ -31,19 +31,19 @@ $(function(){
 		},
 
 
-		getImage: function() {
+		getImage: function() {//for clicked cat
 			this.catImageList = octopus.getCatImageList();
 			viewMain.render.image = this.catImageList[this.index];
 		},
 
 
-		getName: function() {
+		getName: function() {//for clicked cat
 			viewMain.render.headline = this.innerHTML;
 		},
 
 
 		init: function() {
-			//model.init();
+			viewMain.init();
 			viewSidebar.init();
 		}
 	};
@@ -80,7 +80,17 @@ $(function(){
 	var viewMain = {
 
 		init: function() {
-
+			var initialCat = 0;
+			viewMain.div();
+			viewMain.headlineTop(initialCat);
+			viewMain.imageLarge(initialCat);
+			viewMain.counterBottom();
+			
+			//append to page
+			document.getElementById('catArea').appendChild(viewMain.heroCatDiv);
+			viewMain.heroCatDiv.appendChild(viewMain.headline);
+			viewMain.heroCatDiv.appendChild(viewMain.image);
+			viewMain.heroCatDiv.appendChild(viewMain.counter);
 		},
 
 
@@ -88,13 +98,12 @@ $(function(){
 			this.clickEvent = this;
 			viewMain.clearPage();
 
-			viewMain.div();
+			//viewMain.div();
 			viewMain.headlineTop();
 			viewMain.imageLarge();
 			viewMain.counterBottom();
 
 			//append to page
-			this.catArea = document.getElementById('catArea').appendChild(viewMain.heroCatDiv);
 			viewMain.heroCatDiv.appendChild(viewMain.headline);
 			viewMain.heroCatDiv.appendChild(viewMain.image);
 			viewMain.heroCatDiv.appendChild(viewMain.counter);
@@ -103,22 +112,35 @@ $(function(){
 
 		div: function() {
 			this.heroCatDiv = document.createElement('DIV');
-			this.heroCatDiv.setAttribute('class', 'heroCatDiv');
+			this.heroCatDiv.setAttribute('id', 'heroCatDiv');
 		},
 
 
-		headlineTop: function() {
+		headlineTop: function(initialCat) {
 			this.headline = document.createElement('H1');
-			this.headline.innerHTML = viewMain.render.headline;
+			if (initialCat > -1) {
+				var catList = octopus.getCatList();
+				var cat = catList[initialCat];
+				this.headline.innerHTML = cat;
+			}else {
+				this.headline.innerHTML = viewMain.render.headline;
+			}
+			
 		},
 
 
-		imageLarge: function() {
+		imageLarge: function(initialCat) {
 			this.image = document.createElement('IMG');
-			this.image.setAttribute('src', viewMain.render.image);
 			this.image.setAttribute('alt', 'cat pic');
 			this.image.setAttribute('class', 'catButton');
 			this.image.addEventListener('click', viewMain.cycleCounter);
+			if (initialCat > -1) {
+				var catImageList = octopus.getCatImageList();
+				var cat = catImageList[initialCat];
+				this.image.setAttribute('src', cat);
+			}else {
+				this.image.setAttribute('src', viewMain.render.image);
+			}
 		},
 
 
@@ -130,8 +152,8 @@ $(function(){
 
 
 		clearPage: function() {
-			document.getElementById('catArea').innerHTML = '';
-			document.getElementById('catArea').img = '';
+			document.getElementById('heroCatDiv').innerHTML = '';
+			document.getElementById('heroCatDiv').img = '';
 		},
 
 
