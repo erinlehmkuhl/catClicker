@@ -24,7 +24,7 @@ body {
 	width: 60%;
 }
 
-.counterNumber {
+#counterNumber {
 	font-size: 50px;
 }
 

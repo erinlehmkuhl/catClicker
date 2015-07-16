@@ -1,12 +1,15 @@
 $(function(){
 
+	//which cat would you like to start with in the hero div?
+	var initialCat = 0;
+
 	var model = {
 		'kittens':[
-			{'name': 'Scout', 'image': 'img/kitten.jpg', 'counter': 0},
-			{'name': 'Archimedes', 'image': 'img/catStaircase.jpg', 'counter': 0},
-			{'name': 'Blue', 'image': 'img/baby.jpg', 'counter': 0},
-			{'name': 'Smalls', 'image': 'img/catritto.jpg', 'counter': 0},
-			{'name': 'Chukes', 'image': 'img/guineaPig.jpg', 'counter': 0}
+			{'name': 'Scout', 'image': 'img/kitten.jpg', 'count': 0},
+			{'name': 'Archimedes', 'image': 'img/catStaircase.jpg', 'count': 0},
+			{'name': 'Blue', 'image': 'img/baby.jpg', 'count': 0},
+			{'name': 'Smalls', 'image': 'img/catritto.jpg', 'count': 0},
+			{'name': 'Chukes', 'image': 'img/guineaPig.jpg', 'count': 0}
 		]
 	};
 
@@ -31,20 +34,35 @@ $(function(){
 		},
 
 
-		getImage: function() {//for clicked cat
-			this.catImageList = octopus.getCatImageList();
-			viewMain.render.image = this.catImageList[this.index];
-		},
-
-
-		getName: function() {//for clicked cat
-			viewMain.render.headline = this.innerHTML;
-		},
-
-
 		init: function() {
-			viewMain.init();
 			viewSidebar.init();
+			octopus.makeCurrentCat();
+			viewMain.init();
+		},
+
+		//invoked onclick so 'this' has specific cat information
+		makeCurrentCat: function() {
+			octopus.currentCat.name = model.kittens[this.index || initialCat].name;
+			octopus.currentCat.index = this.index || initialCat;
+			octopus.currentCat.retrieveCount = model.kittens[this.index || initialCat].count;
+			octopus.currentCat.image = model.kittens[this.index || initialCat].image;
+
+			console.log("cur cat count: " + model.kittens[this.index || initialCat].count);
+		},
+
+
+		"currentCat": {
+			"name": this.name,
+			"index": (this.index),
+			"retrieveCount": model.kittens[this.index || initialCat].count,
+			"image": this.image
+		}, 
+
+		storeCount: function(currentClickCount) {
+			model.kittens[octopus.currentCat.index].count = currentClickCount;
+			console.log("index: " + octopus.currentCat.index);
+			console.log("retrieveCount: " + octopus.currentCat.retrieveCount);
+
 		}
 	};
 
@@ -61,9 +79,10 @@ $(function(){
 				this.sideBarName = document.createElement('H2');
 				this.sideBarName.innerHTML = this.catList[i];
 				this.sideBarName.index = i;
-				this.sideBarName.addEventListener('click', octopus.getName);
-				this.sideBarName.addEventListener('click', octopus.getImage);
+				octopus.currentCat.index = i;
+				this.sideBarName.addEventListener('click', octopus.makeCurrentCat);
 				this.sideBarName.addEventListener('click', viewMain.render);
+
 				
 				viewSidebar.render();
 			}
@@ -80,80 +99,54 @@ $(function(){
 	var viewMain = {
 
 		init: function() {
-			var initialCat = 0;
-			viewMain.div();
-			viewMain.headlineTop(initialCat);
-			viewMain.imageLarge(initialCat);
-			viewMain.counterBottom();
-			
-			//append to page
+
+			//make div and append
+			viewMain.heroCatDiv = document.createElement('DIV');
+			viewMain.heroCatDiv.setAttribute('id', 'heroCatDiv');
 			document.getElementById('catArea').appendChild(viewMain.heroCatDiv);
+
+			//make headline
+			viewMain.headline = document.createElement('H1');
+			viewMain.headline.innerHTML = octopus.currentCat.name;
 			viewMain.heroCatDiv.appendChild(viewMain.headline);
+
+			//make image
+			viewMain.image = document.createElement('IMG');
+			viewMain.image.setAttribute('alt', 'cat pic');
+			viewMain.image.setAttribute('class', 'catButton');
+			viewMain.image.addEventListener('click', viewMain.cycleCounter);
+			viewMain.image.setAttribute('src', octopus.currentCat.image);
 			viewMain.heroCatDiv.appendChild(viewMain.image);
+
+			//make counter
+			viewMain.counter = document.createElement('P');
+			viewMain.counter.innerHTML = octopus.currentCat.retrieveCount;
+			viewMain.counter.setAttribute('id', 'counterNumber');
 			viewMain.heroCatDiv.appendChild(viewMain.counter);
 		},
 
 
 		render: function() {
-			this.clickEvent = this;
 			viewMain.clearPage();
 
-			//viewMain.div();
-			viewMain.headlineTop();
-			viewMain.imageLarge();
-			viewMain.counterBottom();
-
-			//append to page
+			//headline update
+			viewMain.headline.innerHTML = octopus.currentCat.name;
 			viewMain.heroCatDiv.appendChild(viewMain.headline);
+
+			//image update
+			viewMain.image.setAttribute('src', octopus.currentCat.image);
 			viewMain.heroCatDiv.appendChild(viewMain.image);
+
+			//run counter
+			viewMain.counter.innerHTML = octopus.currentCat.retrieveCount;
 			viewMain.heroCatDiv.appendChild(viewMain.counter);
 		}, 
-
-
-		div: function() {
-			this.heroCatDiv = document.createElement('DIV');
-			this.heroCatDiv.setAttribute('id', 'heroCatDiv');
-		},
-
-
-		headlineTop: function(initialCat) {
-			this.headline = document.createElement('H1');
-			if (initialCat > -1) {
-				var catList = octopus.getCatList();
-				var cat = catList[initialCat];
-				this.headline.innerHTML = cat;
-			}else {
-				this.headline.innerHTML = viewMain.render.headline;
-			}
-			
-		},
-
-
-		imageLarge: function(initialCat) {
-			this.image = document.createElement('IMG');
-			this.image.setAttribute('alt', 'cat pic');
-			this.image.setAttribute('class', 'catButton');
-			this.image.addEventListener('click', viewMain.cycleCounter);
-			if (initialCat > -1) {
-				var catImageList = octopus.getCatImageList();
-				var cat = catImageList[initialCat];
-				this.image.setAttribute('src', cat);
-			}else {
-				this.image.setAttribute('src', viewMain.render.image);
-			}
-		},
-
-
-		counterBottom: function() {
-			this.counter = document.createElement('P');
-			this.counter.innerHTML = '0';
-			this.counter.setAttribute('class', 'counterNumber');
-		},
 
 
 		clearPage: function() {
 			document.getElementById('heroCatDiv').innerHTML = '';
 			document.getElementById('heroCatDiv').img = '';
+			//document.getElementById('counterNumber').innerHTML = '';
 		},
 
 
@@ -161,6 +154,8 @@ $(function(){
 			this.num = this.nextSibling.innerHTML;
 			this.num++;
 			this.nextSibling.innerHTML = this.num;
+			
+			octopus.storeCount(this.num);
 		}
 
 	};
