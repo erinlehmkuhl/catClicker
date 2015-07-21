@@ -2,8 +2,10 @@ $(function(){
 
 	//which cat would you like to start with in the hero div?
 	var initialCat = 0;
-
+	//admin window visible/hidden
+	var adminToggle = 0;
 	var model = {
+
 		'kittens':[
 			{'name': 'Scout', 'image': 'img/kitten.jpg', 'count': 0},
 			{'name': 'Archimedes', 'image': 'img/catStaircase.jpg', 'count': 0},
@@ -11,6 +13,7 @@ $(function(){
 			{'name': 'Smalls', 'image': 'img/catritto.jpg', 'count': 0},
 			{'name': 'Chukes', 'image': 'img/guineaPig.jpg', 'count': 0}
 		]
+
 	};
 
 
@@ -38,6 +41,7 @@ $(function(){
 			viewSidebar.init();
 			octopus.makeCurrentCat();
 			viewMain.init();
+			viewAdmin.init();
 		},
 
 		//invoked onclick so 'this' has specific cat information
@@ -46,8 +50,6 @@ $(function(){
 			octopus.currentCat.index = this.index || initialCat;
 			octopus.currentCat.retrieveCount = model.kittens[this.index || initialCat].count;
 			octopus.currentCat.image = model.kittens[this.index || initialCat].image;
-
-			console.log("cur cat count: " + model.kittens[this.index || initialCat].count);
 		},
 
 
@@ -60,9 +62,22 @@ $(function(){
 
 		storeCount: function(currentClickCount) {
 			model.kittens[octopus.currentCat.index].count = currentClickCount;
-			console.log("index: " + octopus.currentCat.index);
-			console.log("retrieveCount: " + octopus.currentCat.retrieveCount);
+		}, 
 
+		adminUpdateHero: function() {
+			if (document.getElementById("overrideName").value){
+				octopus.currentCat.name = document.getElementById("overrideName").value;
+			}
+			if (document.getElementById("overrideImage").value){
+				octopus.currentCat.image = document.getElementById("overrideImage").value;
+			}
+			if (document.getElementById("overrideNumClicks").value){
+				model.kittens[octopus.currentCat.index].count = document.getElementById("overrideNumClicks").value;
+				octopus.currentCat.retrieveCount = document.getElementById("overrideNumClicks").value;
+			}else {
+				octopus.currentCat.retrieveCount = document.getElementById("counterNumber").innerHTML;
+			}
+			viewMain.render();
 		}
 	};
 
@@ -146,7 +161,6 @@ $(function(){
 		clearPage: function() {
 			document.getElementById('heroCatDiv').innerHTML = '';
 			document.getElementById('heroCatDiv').img = '';
-			//document.getElementById('counterNumber').innerHTML = '';
 		},
 
 
@@ -160,6 +174,51 @@ $(function(){
 
 	};
 
+
+	var viewAdmin = {
+		init: function() {
+			//make admin button
+			this.button = document.getElementById("adminButton");
+			this.button.addEventListener('click', viewAdmin.showPanel);
+
+			//make panel
+			var newForm = document.createElement("FORM");
+			newForm.setAttribute("id", "adminForm");
+			document.getElementById("adminArea").appendChild(newForm);
+
+			var formLabels = ["overrideName", "overrideImage", "overrideNumClicks"];
+			for (var i = 0; i < formLabels.length; i++){
+				var newInput = document.createElement("INPUT");
+				newInput.setAttribute("type", "text");
+				newInput.setAttribute("id", formLabels[i]);
+				newInput.setAttribute("placeholder", formLabels[i]);
+				document.getElementById("adminForm").appendChild(newInput);
+			}
+
+			var buttonLabels = ["submit", "cancel"];
+			for (var i = 0; i < buttonLabels.length; i++){
+				var newButton = document.createElement("BUTTON");
+				var newText = document.createTextNode(buttonLabels[i]);
+				newButton.appendChild(newText);
+				newButton.addEventListener('click', octopus.adminUpdateHero);
+				document.getElementById("adminArea").appendChild(newButton);
+			}
+
+		},
+
+		
+		showPanel: function() {
+
+		},
+
+		
+
+
+
+		cancel: function() {
+
+		}
+	};
+
     octopus.init();
 });
-

@@ -6,7 +6,6 @@
 }
 
 body {
-	padding-top: 10px;
 	text-align: center;
 }
 
@@ -15,7 +14,7 @@ body {
 }
 
 
-#catArea, #listArea {
+#catArea, #listArea, #adminArea {
 	width: 40%;
 	border: 1px solid black;
 }
@@ -25,7 +24,7 @@ body {
 }
 
 #counterNumber {
-	font-size: 50px;
+	font-size: 35px;
 }
 
 img {
