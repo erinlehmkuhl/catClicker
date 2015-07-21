@@ -67,9 +67,11 @@ $(function(){
 		adminUpdateHero: function() {
 			if (document.getElementById("overrideName").value){
 				octopus.currentCat.name = document.getElementById("overrideName").value;
+				model.kittens[octopus.currentCat.index].name = document.getElementById("overrideName").value;
 			}
 			if (document.getElementById("overrideImage").value){
 				octopus.currentCat.image = document.getElementById("overrideImage").value;
+				model.kittens[octopus.currentCat.index].image = document.getElementById("overrideImage").value;
 			}
 			if (document.getElementById("overrideNumClicks").value){
 				model.kittens[octopus.currentCat.index].count = document.getElementById("overrideNumClicks").value;
@@ -78,6 +80,8 @@ $(function(){
 				octopus.currentCat.retrieveCount = document.getElementById("counterNumber").innerHTML;
 			}
 			viewMain.render();
+			adminToggle = 0;
+			viewAdmin.checkAdminToggle();
 		}
 	};
 
@@ -178,8 +182,8 @@ $(function(){
 	var viewAdmin = {
 		init: function() {
 			//make admin button
-			this.button = document.getElementById("adminButton");
-			this.button.addEventListener('click', viewAdmin.showPanel);
+			var adminButton = document.getElementById("adminButton");
+			adminButton.addEventListener('click', viewAdmin.openMenu);
 
 			//make panel
 			var newForm = document.createElement("FORM");
@@ -195,28 +199,43 @@ $(function(){
 				document.getElementById("adminForm").appendChild(newInput);
 			}
 
-			var buttonLabels = ["submit", "cancel"];
-			for (var i = 0; i < buttonLabels.length; i++){
-				var newButton = document.createElement("BUTTON");
-				var newText = document.createTextNode(buttonLabels[i]);
-				newButton.appendChild(newText);
-				newButton.addEventListener('click', octopus.adminUpdateHero);
-				document.getElementById("adminArea").appendChild(newButton);
-			}
+			//make submit button
+			var submitButton = document.createElement("BUTTON");
+			var newText = document.createTextNode("submit");
+			submitButton.appendChild(newText);
+			submitButton.addEventListener('click', octopus.adminUpdateHero);
+			document.getElementById("adminArea").appendChild(submitButton);
 
+
+			//make cancel button
+			var cancelButton = document.createElement("BUTTON");
+			var newText = document.createTextNode("cancel");
+			cancelButton.appendChild(newText);
+			cancelButton.addEventListener('click', viewAdmin.cancel);
+			document.getElementById("adminArea").appendChild(cancelButton);
+
+
+			viewAdmin.checkAdminToggle();
 		},
 
-		
-		showPanel: function() {
 
+		openMenu: function() {
+			adminToggle = 1;
+			viewAdmin.checkAdminToggle();
 		},
 
+
+		cancel: function () {
+			adminToggle = 0;
+			viewAdmin.checkAdminToggle();
+		},
 		
 
-
-
-		cancel: function() {
-
+		checkAdminToggle: function() {
+			if (adminToggle === 0) {
+				document.getElementById("adminArea").style.display = "none";
+			}else if (adminToggle === 1)
+				document.getElementById("adminArea").style.display = "block";			
 		}
 	};
 
