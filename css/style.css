@@ -6,7 +6,6 @@
 }
 
 body {
-	padding-top: 10px;
 	text-align: center;
 }
 
@@ -15,7 +14,7 @@ body {
 }
 
 
-#catArea, #listArea {
+#catArea, #listArea, #adminArea {
 	width: 40%;
 	border: 1px solid black;
 }
@@ -24,8 +23,8 @@ body {
 	width: 60%;
 }
 
-.counterNumber {
-	font-size: 50px;
+#counterNumber {
+	font-size: 35px;
 }
 
 img {
